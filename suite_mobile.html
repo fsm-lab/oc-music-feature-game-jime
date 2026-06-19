@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sound Match Arena Mobile</title>
+  <link rel="stylesheet" href="suite.css">
+  <script>
+    window.SUITE_MOBILE_LAYOUT = true;
+    window.SUITE_COLLECTION_MODE = "public";
+  </script>
+</head>
+<body class="mobile-layout">
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Sound Match Arena</h1>
+        <p class="subtitle">短い音を聞いて、近い順に並べるミニゲーム</p>
+      </div>
+      <div class="hud" aria-label="進行状況">
+        <div class="meter"><b id="roundMeter">0/3</b><span>ROUND</span></div>
+        <div class="meter"><b id="timerMeter">0:00</b><span>TIME</span></div>
+        <div class="meter"><b id="scoreMeter">0</b><span>SCORE</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="intro" class="screen active">
+      <div class="intro-grid">
+        <div class="hero">
+          <h2>近い順に並べる。</h2>
+          <p>お手本を聞いて、近いと感じる順番に候補を並べてください。</p>
+          <div class="setup">
+            <label>参加コード<input id="participantInput" placeholder="空欄なら自動発行"></label>
+          </div>
+          <label class="wide hidden-control">ゲーム形式<select id="variantSelect"></select></label>
+          <div class="mode-row">
+            <span id="modeBadge"></span>
+            <a id="modeSwitch" href="#"></a>
+          </div>
+          <button id="startBtn" type="button">スタート</button>
+          <p class="notice">氏名、学校名、連絡先は入力しません。1回はだいたい2分以内です。</p>
+        </div>
+        <aside class="side">
+          <div class="wave-art" aria-hidden="true"></div>
+          <div id="variantSummary" class="variant-summary"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="game" class="screen">
+      <div class="round-panel">
+        <div class="round-head">
+          <div>
+            <h2 id="roundTitle">Round</h2>
+            <p id="roundPrompt"></p>
+          </div>
+          <div class="progress" aria-label="進捗"><div id="progressBar"></div></div>
+        </div>
+        <div id="taskRoot"></div>
+        <div class="actions">
+          <button id="nextBtn" type="button" disabled>この順番で決定</button>
+          <button id="quitBtn" type="button" class="ghost">中断</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="finish" class="screen">
+      <div class="finish-panel">
+        <h2>完了</h2>
+        <p id="finishText"></p>
+        <div class="code" id="resultCode"></div>
+        <table id="summaryTable"></table>
+        <div class="actions">
+          <button id="againBtn" type="button">もう一度遊ぶ</button>
+          <button id="downloadJsonBtn" type="button" class="secondary">JSON保存</button>
+          <button id="downloadCsvBtn" type="button" class="secondary">CSV保存</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="cards_2sec.js"></script>
+  <script src="suite_app.js"></script>
+</body>
+</html>

@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Match Challenge</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5c667a;
+      --line: #d8dde8;
+      --panel: #ffffff;
+      --page: #f4f7fb;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --good: #166534;
+      --shadow: 0 10px 28px rgba(23, 32, 51, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Yu Gothic UI", "Meiryo", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #e8f3f0 0, transparent 34%),
+        radial-gradient(circle at 80% 0%, #fff1d6 0, transparent 30%),
+        var(--page);
+      letter-spacing: 0;
+    }
+    button, input, select { font: inherit; }
+    button {
+      border: 0;
+      border-radius: 8px;
+      color: white;
+      background: var(--accent);
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 42px;
+    }
+    button.secondary { background: #334155; }
+    button.ghost {
+      color: var(--ink);
+      background: #e8edf5;
+      border: 1px solid var(--line);
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .wrap { width: min(1120px, calc(100% - 28px)); margin: 0 auto; }
+    header {
+      min-height: 92px;
+      padding: 18px 0 12px;
+      border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+      background: rgba(244, 247, 251, 0.7);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 38px); line-height: 1.05; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(82px, 1fr));
+      gap: 8px;
+      width: min(380px, 100%);
+    }
+    .meter {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .meter b { display: block; font-size: 20px; }
+    .meter span { color: var(--muted); font-size: 12px; font-weight: 700; }
+    main { padding: 22px 0 42px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+    .hero, .side, .round-panel, .finish-panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .hero { padding: 24px; }
+    .hero h2 { margin: 0 0 12px; font-size: clamp(28px, 5vw, 58px); line-height: 1.02; }
+    .hero p { margin: 0 0 18px; color: var(--muted); font-size: 17px; line-height: 1.75; }
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .rule {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfe;
+      min-height: 96px;
+    }
+    .rule b { display: block; margin-bottom: 6px; }
+    .rule span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .notice {
+      margin: 14px 0 0;
+      padding: 10px 12px;
+      border-left: 4px solid var(--accent);
+      background: #eaf7f4;
+      color: #164e4a;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .side { padding: 18px; display: grid; align-content: center; gap: 14px; }
+    .wave-art {
+      width: 100%;
+      aspect-ratio: 1.5;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #172033, #0f766e 52%, #f59e0b);
+      display: grid;
+      grid-template-columns: repeat(22, 1fr);
+      align-items: center;
+      gap: 4px;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .wave-art i {
+      display: block;
+      height: calc(16% + var(--h) * 1%);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
+    }
+    .setup {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0 0;
+    }
+    label { display: grid; gap: 5px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    input, select {
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .round-panel { padding: 16px; }
+    .round-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .round-title h2 { margin: 0; font-size: 24px; }
+    .round-title p { margin: 4px 0 0; color: var(--muted); }
+    .progress {
+      width: min(280px, 40vw);
+      height: 10px;
+      border-radius: 999px;
+      background: #dfe6f0;
+      overflow: hidden;
+    }
+    .progress div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #f59e0b); }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 12px 0 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 330px;
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: 10px;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+    .card:focus-within, .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(15, 118, 110, 0.65);
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.12);
+    }
+    .card.dragging { opacity: 0.55; }
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #172033;
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .rank {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .rank strong { font-size: 15px; }
+    .rank span {
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    .pair-label { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    audio { width: 100%; height: 38px; }
+    .audio-box {
+      display: grid;
+      gap: 8px;
+      align-self: start;
+    }
+    .clip-label {
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .move-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .move-row button { padding: 7px 8px; min-height: 36px; }
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-top: 8px;
+    }
+    .confidence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .confidence button {
+      background: #e8edf5;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      min-height: 38px;
+      padding: 8px 10px;
+    }
+    .confidence button.active {
+      background: #fff7ed;
+      border-color: #fb923c;
+      color: #9a3412;
+    }
+    .finish-panel { padding: 22px; }
+    .finish-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .result-code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 20px;
+      padding: 12px;
+      background: #172033;
+      color: #fff;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; font-size: 14px; }
+    th { background: #edf2f7; }
+    tr:last-child td { border-bottom: 0; }
+    details {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 10px 12px;
+    }
+    summary { cursor: pointer; font-weight: 800; }
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: #172033;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      z-index: 20;
+    }
+    .toast.show { opacity: 1; }
+    @media (max-width: 920px) {
+      .topbar, .intro, .finish-grid { grid-template-columns: 1fr; display: grid; }
+      .hud { width: 100%; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .choices { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 18px, 1120px); }
+      header { position: static; }
+      .rules, .setup, .cards { grid-template-columns: 1fr; }
+      .card { min-height: 0; }
+      .round-head { align-items: start; flex-direction: column; }
+      .progress { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Music Match Challenge</h1>
+        <p class="subtitle">4つの聞き比べカードを、似ている順に並べるだけ</p>
+      </div>
+      <div class="hud" aria-label="進行状況">
+        <div class="meter"><b id="roundMeter">0/3</b><span>ROUND</span></div>
+        <div class="meter"><b id="timerMeter">0:00</b><span>TIME</span></div>
+        <div class="meter"><b id="scoreMeter">0</b><span>SCORE</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="intro" class="screen active">
+      <div class="intro">
+        <div class="hero">
+          <h2>耳だけで、いちばん近い音を探す。</h2>
+          <p>1ラウンドに4枚のカードが出ます。各カードの2つの短い音を聞いて、似ていると思う順に上から並べてください。3ラウンドで終わります。</p>
+          <div class="rules">
+            <div class="rule"><b>Listen</b><span>カード内の2つの音を聞く。全部を完璧に聞かなくても進めます。</span></div>
+            <div class="rule"><b>Rank</b><span>似ているカードを上へ移動。直感で構いません。</span></div>
+            <div class="rule"><b>Finish</b><span>最後に記録コードをスタッフへ見せて完了です。</span></div>
+          </div>
+          <div class="setup">
+            <label>参加コード
+              <input id="participantInput" autocomplete="off" maxlength="24" placeholder="空欄なら自動発行">
+            </label>
+            <label>年代
+              <select id="ageInput">
+                <option value="high_school">高校生</option>
+                <option value="guardian">保護者</option>
+                <option value="other">その他</option>
+              </select>
+            </label>
+          </div>
+          <p class="notice">匿名の選択ログをこの端末に保存します。氏名、学校名、連絡先は入力しません。</p>
+          <button id="startBtn">スタート</button>
+        </div>
+        <aside class="side">
+          <div class="wave-art" aria-hidden="true">
+            <i style="--h:24"></i><i style="--h:48"></i><i style="--h:33"></i><i style="--h:72"></i><i style="--h:41"></i><i style="--h:60"></i><i style="--h:28"></i><i style="--h:80"></i><i style="--h:46"></i><i style="--h:65"></i><i style="--h:35"></i><i style="--h:88"></i><i style="--h:55"></i><i style="--h:31"></i><i style="--h:74"></i><i style="--h:43"></i><i style="--h:69"></i><i style="--h:29"></i><i style="--h:51"></i><i style="--h:83"></i><i style="--h:38"></i><i style="--h:58"></i>
+          </div>
+          <p class="subtitle">短い音を聞き比べる展示です。音量を上げすぎず、周りの人と交代しながら遊べます。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="game" class="screen">
+      <div class="round-panel">
+        <div class="round-head">
+          <div class="round-title">
+            <h2 id="roundTitle">Round 1</h2>
+            <p id="roundPrompt">似ていると思う順にカードを並べてください。</p>
+          </div>
+          <div class="progress" aria-label="進捗"><div id="progressBar"></div></div>
+        </div>
+        <div id="cards" class="cards" aria-live="polite"></div>
+        <div class="choices">
+          <div>
+            <label>迷い度
+              <div id="confidence" class="confidence">
+                <button type="button" data-value="clear">すぐ決まった</button>
+                <button type="button" data-value="some">少し迷った</button>
+                <button type="button" data-value="hard">かなり迷った</button>
+              </div>
+            </label>
+          </div>
+          <button id="nextBtn" disabled>この順番で決定</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="finish" class="screen">
+      <div class="finish-panel">
+        <div class="finish-grid">
+          <div>
+            <h2>Complete</h2>
+            <p class="subtitle">記録コードをスタッフに見せてください。</p>
+            <div id="resultCode" class="result-code"></div>
+            <p id="finishText"></p>
+            <button id="againBtn">もう一度遊ぶ</button>
+          </div>
+          <div>
+            <table>
+              <thead><tr><th>項目</th><th>値</th></tr></thead>
+              <tbody id="summaryTable"></tbody>
+            </table>
+            <details>
+              <summary>スタッフ用</summary>
+              <div class="admin-actions">
+                <button class="secondary" id="downloadJsonBtn">JSONを保存</button>
+                <button class="secondary" id="downloadCsvBtn">CSVを保存</button>
+                <button class="ghost" id="copyCodeBtn">記録コードをコピー</button>
+              </div>
+              <p class="subtitle">サーバー起動時は自動で `logs/events.jsonl` に追記されます。静的表示時は上の保存ボタンで回収します。</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+
+  <script src="cards_2sec.js"></script>
+  <script>
+    const AUDIO_ROOT = "http://fsm-lab.cs.teu.ac.jp:18381/10_graduation_current/outputs/20260601_method_sweep/subjective_objective_test";
+    const FULL = `${AUDIO_ROOT}/full_audio`;
+    const CLIPS = `${AUDIO_ROOT}/clips`;
+
+    const fallbackRounds = [
+      {
+        id: "pitch_vs_chroma",
+        prompt: "メロディや音の高さが近いと感じるカードを上へ。",
+        cards: [
+          {
+            feature: "pitch_interval_euclidean",
+            group: "pitch_interval",
+            publicLabel: "Card",
+            piece: "Bach_BWV849-01_001_20090916-SMD",
+            mode: "fixed_window_1p0",
+            pair: "pair01",
+            source: `${CLIPS}/Bach_BWV849-01_001_20090916-SMD/fixed_window_1p0/pitch_interval_euclidean/pair01_source_node59.wav`,
+            target: `${CLIPS}/Bach_BWV849-01_001_20090916-SMD/fixed_window_1p0/pitch_interval_euclidean/pair01_target_node101.wav`
+          },
+          {
+            feature: "pitch_contour_euclidean",
+            group: "pitch_contour",
+            publicLabel: "Card",
+            piece: "Bach_BWV849-01_001_20090916-SMD",
+            mode: "fixed_window_1p0",
+            pair: "pair01",
+            source: `${CLIPS}/Bach_BWV849-01_001_20090916-SMD/fixed_window_1p0/pitch_contour_euclidean/pair01_source_node1.wav`,
+            target: `${CLIPS}/Bach_BWV849-01_001_20090916-SMD/fixed_window_1p0/pitch_contour_euclidean/pair01_target_node12.wav`
+          },
+          {
+            feature: "chroma_cosine",
+            group: "notename_distribution",
+            publicLabel: "Card",
+            piece: "Mozart_KV265_006_20110315-SMD",
+            mode: "tempo_window_1p504",
+            pair: "pair02",
+            source: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_1p504/chroma_cosine/pair02_source_node42.wav`,
+            target: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_1p504/chroma_cosine/pair02_target_node46.wav`
+          },
+          {
+            feature: "audio_chroma_cosine",
+            group: "audio_chroma",
+            publicLabel: "Card",
+            piece: "Haydn_HobXVINo52-03_008_20110315-SMD",
+            mode: "tempo_window_0p3",
+            pair: "pair01",
+            source: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/tempo_window_0p3/audio_chroma_cosine/pair01_source_node598.wav`,
+            target: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/tempo_window_0p3/audio_chroma_cosine/pair01_target_node821.wav`
+          }
+        ]
+      },
+      {
+        id: "rhythm_vs_timbre",
+        prompt: "リズムや音の質感が近いと感じるカードを上へ。",
+        cards: [
+          {
+            feature: "rhythm_density_euclidean",
+            group: "rhythm_density",
+            publicLabel: "Card",
+            piece: "Mozart_KV265_006_20110315-SMD",
+            mode: "tempo_window_0p752",
+            pair: "pair03",
+            source: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_0p752/rhythm_density_euclidean/pair03_source_node282.wav`,
+            target: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_0p752/rhythm_density_euclidean/pair03_target_node308.wav`
+          },
+          {
+            feature: "rhythm_periodicity_euclidean",
+            group: "rhythm_periodicity",
+            publicLabel: "Card",
+            piece: "Beethoven_Op027No1-02_003_20090916-SMD",
+            mode: "tempo_window_0p768",
+            pair: "pair01",
+            source: `${CLIPS}/Beethoven_Op027No1-02_003_20090916-SMD/tempo_window_0p768/rhythm_periodicity_euclidean/pair01_source_node48.wav`,
+            target: `${CLIPS}/Beethoven_Op027No1-02_003_20090916-SMD/tempo_window_0p768/rhythm_periodicity_euclidean/pair01_target_node90.wav`
+          },
+          {
+            feature: "spectral_timbre_euclidean",
+            group: "spectral_timbre",
+            publicLabel: "Card",
+            piece: "Haydn_HobXVINo52-03_008_20110315-SMD",
+            mode: "onset_onset",
+            pair: "pair01",
+            source: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/onset_onset/spectral_timbre_euclidean/pair01_source_node983.wav`,
+            target: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/onset_onset/spectral_timbre_euclidean/pair01_target_node2724.wav`
+          },
+          {
+            feature: "spectral_contrast_euclidean",
+            group: "spectral_contrast",
+            publicLabel: "Card",
+            piece: "Mozart_KV265_006_20110315-SMD",
+            mode: "onset_onset",
+            pair: "pair01",
+            source: `${CLIPS}/Mozart_KV265_006_20110315-SMD/onset_onset/spectral_contrast_euclidean/pair01_source_node535.wav`,
+            target: `${CLIPS}/Mozart_KV265_006_20110315-SMD/onset_onset/spectral_contrast_euclidean/pair01_target_node3937.wav`
+          }
+        ]
+      },
+      {
+        id: "attack_vs_summary",
+        prompt: "全体として同じ感じに聞こえるカードを上へ。",
+        cards: [
+          {
+            feature: "onset_strength_euclidean",
+            group: "onset_strength",
+            publicLabel: "Card",
+            piece: "Beethoven_Op027No1-02_003_20090916-SMD",
+            mode: "tempo_window_0p384",
+            pair: "pair02",
+            source: `${CLIPS}/Beethoven_Op027No1-02_003_20090916-SMD/tempo_window_0p384/onset_strength_euclidean/pair02_source_node186.wav`,
+            target: `${CLIPS}/Beethoven_Op027No1-02_003_20090916-SMD/tempo_window_0p384/onset_strength_euclidean/pair02_target_node336.wav`
+          },
+          {
+            feature: "mfcc_timbre_euclidean",
+            group: "mfcc_timbre",
+            publicLabel: "Card",
+            piece: "Mozart_KV265_006_20110315-SMD",
+            mode: "onset_onset",
+            pair: "pair01",
+            source: `${CLIPS}/Mozart_KV265_006_20110315-SMD/onset_onset/mfcc_timbre_euclidean/pair01_source_node1155.wav`,
+            target: `${CLIPS}/Mozart_KV265_006_20110315-SMD/onset_onset/mfcc_timbre_euclidean/pair01_target_node1376.wav`
+          },
+          {
+            feature: "tonnetz_key_euclidean",
+            group: "tonnetz_key",
+            publicLabel: "Card",
+            piece: "Haydn_HobXVINo52-03_008_20110315-SMD",
+            mode: "tempo_window_1p2",
+            pair: "pair01",
+            source: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/tempo_window_1p2/tonnetz_key_euclidean/pair01_source_node7.wav`,
+            target: `${CLIPS}/Haydn_HobXVINo52-03_008_20110315-SMD/tempo_window_1p2/tonnetz_key_euclidean/pair01_target_node76.wav`
+          },
+          {
+            feature: "euclidean_current_6features",
+            group: "current_6features",
+            publicLabel: "Card",
+            piece: "Mozart_KV265_006_20110315-SMD",
+            mode: "tempo_window_1p504",
+            pair: "pair03",
+            source: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_1p504/euclidean_current_6features/pair03_source_node227.wav`,
+            target: `${CLIPS}/Mozart_KV265_006_20110315-SMD/tempo_window_1p504/euclidean_current_6features/pair03_target_node270.wav`
+          }
+        ]
+      }
+    ];
+    const rounds = window.MUSIC_MATCH_ROUNDS || fallbackRounds;
+
+    const state = {
+      sessionId: "",
+      participantCode: "",
+      ageGroup: "",
+      startedAt: 0,
+      roundStartedAt: 0,
+      currentRound: 0,
+      score: 0,
+      confidence: "",
+      order: [],
+      results: [],
+      events: []
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const labels = ["A", "B", "C", "D"];
+    let timerId = null;
+
+    function showToast(text) {
+      $("toast").textContent = text;
+      $("toast").classList.add("show");
+      window.setTimeout(() => $("toast").classList.remove("show"), 1600);
+    }
+
+    function shuffle(items) {
+      const copy = items.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function formatTime(ms) {
+      const sec = Math.floor(ms / 1000);
+      return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+    }
+
+    function updateHud() {
+      $("roundMeter").textContent = `${Math.min(state.currentRound + 1, rounds.length)}/${rounds.length}`;
+      $("timerMeter").textContent = state.startedAt ? formatTime(Date.now() - state.startedAt) : "0:00";
+      $("scoreMeter").textContent = String(state.score);
+      $("progressBar").style.width = `${(state.currentRound / rounds.length) * 100}%`;
+    }
+
+    function makeId(prefix) {
+      const bytes = new Uint32Array(2);
+      crypto.getRandomValues(bytes);
+      return `${prefix}-${Date.now().toString(36)}-${Array.from(bytes).map((v) => v.toString(36)).join("")}`;
+    }
+
+    function logEvent(type, payload = {}) {
+      const event = {
+        type,
+        sessionId: state.sessionId,
+        participantCode: state.participantCode,
+        at: new Date().toISOString(),
+        elapsedMs: state.startedAt ? Date.now() - state.startedAt : 0,
+        roundIndex: state.currentRound,
+        ...payload
+      };
+      state.events.push(event);
+      return event;
+    }
+
+    async function sendLog(final = false) {
+      const body = {
+        schema: "open_campus_feature_game.v1",
+        final,
+        sessionId: state.sessionId,
+        participantCode: state.participantCode,
+        ageGroup: state.ageGroup,
+        startedAt: new Date(state.startedAt).toISOString(),
+        finishedAt: final ? new Date().toISOString() : null,
+        totalElapsedMs: state.startedAt ? Date.now() - state.startedAt : 0,
+        score: state.score,
+        results: state.results,
+        events: state.events
+      };
+      localStorage.setItem(`music_match_${state.sessionId}`, JSON.stringify(body));
+      localStorage.setItem("music_match_latest_session", state.sessionId);
+      try {
+        await fetch(new URL("api/log", window.location.href), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+      } catch (error) {
+        // Static file use is expected during local previews.
+      }
+      return body;
+    }
+
+    function activate(screenId) {
+      document.querySelectorAll(".screen").forEach((node) => node.classList.toggle("active", node.id === screenId));
+    }
+
+    function startGame() {
+      state.sessionId = makeId("mmc");
+      state.participantCode = $("participantInput").value.trim() || makeId("guest").slice(0, 18);
+      state.ageGroup = $("ageInput").value;
+      state.startedAt = Date.now();
+      state.currentRound = 0;
+      state.score = 0;
+      state.results = [];
+      state.events = [];
+      logEvent("session_start", { ageGroup: state.ageGroup });
+      activate("game");
+      timerId = window.setInterval(updateHud, 500);
+      renderRound();
+      sendLog(false);
+    }
+
+    function renderRound() {
+      const round = rounds[state.currentRound];
+      state.roundStartedAt = Date.now();
+      state.confidence = "";
+      state.order = shuffle(round.cards).map((card, index) => ({ ...card, label: labels[index], instanceId: `${round.id}_${card.feature}` }));
+      $("roundTitle").textContent = `Round ${state.currentRound + 1}`;
+      $("roundPrompt").textContent = round.prompt;
+      $("nextBtn").disabled = true;
+      document.querySelectorAll("#confidence button").forEach((btn) => btn.classList.remove("active"));
+      renderCards();
+      updateHud();
+      logEvent("round_start", { roundId: round.id, cardOrder: state.order.map((card) => card.feature) });
+    }
+
+    function renderCards() {
+      const root = $("cards");
+      root.innerHTML = "";
+      state.order.forEach((card, index) => {
+        const node = document.createElement("article");
+        node.className = "card";
+        node.draggable = true;
+        node.dataset.index = String(index);
+        node.innerHTML = `
+          <div class="rank"><span class="badge">${card.label}</span><span>${index + 1} 位</span></div>
+          <strong>${card.publicLabel} ${card.label}</strong>
+          <p class="pair-label">2つの音がどれくらい近いかを聞いてください。</p>
+          <div class="audio-box">
+            <div>
+              <div class="clip-label">Clip 1 <span>短い音</span></div>
+              <audio controls preload="metadata" src="${card.source}" data-card="${card.instanceId}" data-clip="source"></audio>
+            </div>
+            <div>
+              <div class="clip-label">Clip 2 <span>短い音</span></div>
+              <audio controls preload="metadata" src="${card.target}" data-card="${card.instanceId}" data-clip="target"></audio>
+            </div>
+          </div>
+          <div class="move-row">
+            <button type="button" class="ghost" data-move="-1" ${index === 0 ? "disabled" : ""}>上へ</button>
+            <button type="button" class="ghost" data-move="1" ${index === state.order.length - 1 ? "disabled" : ""}>下へ</button>
+          </div>
+        `;
+        node.addEventListener("dragstart", (event) => {
+          node.classList.add("dragging");
+          event.dataTransfer.setData("text/plain", String(index));
+        });
+        node.addEventListener("dragend", () => node.classList.remove("dragging"));
+        node.addEventListener("dragover", (event) => event.preventDefault());
+        node.addEventListener("drop", (event) => {
+          event.preventDefault();
+          const from = Number(event.dataTransfer.getData("text/plain"));
+          moveCard(from, index);
+        });
+        node.querySelectorAll("button[data-move]").forEach((button) => {
+          button.addEventListener("click", () => moveCard(index, index + Number(button.dataset.move)));
+        });
+        node.querySelectorAll("audio").forEach((audio) => {
+          audio.addEventListener("play", () => logEvent("audio_play", {
+            roundId: rounds[state.currentRound].id,
+            cardFeature: card.feature,
+            cardGroup: card.group,
+            clip: audio.dataset.clip,
+            src: audio.currentSrc || audio.getAttribute("src")
+          }));
+          audio.addEventListener("ended", () => logEvent("audio_ended", {
+            roundId: rounds[state.currentRound].id,
+            cardFeature: card.feature,
+            cardGroup: card.group,
+            clip: audio.dataset.clip
+          }));
+        });
+        root.appendChild(node);
+      });
+    }
+
+    function moveCard(from, to) {
+      if (to < 0 || to >= state.order.length || from === to) return;
+      const [card] = state.order.splice(from, 1);
+      state.order.splice(to, 0, card);
+      logEvent("rank_move", {
+        roundId: rounds[state.currentRound].id,
+        feature: card.feature,
+        fromRank: from + 1,
+        toRank: to + 1,
+        order: state.order.map((item) => item.feature)
+      });
+      renderCards();
+      $("nextBtn").disabled = !state.confidence;
+    }
+
+    function setConfidence(value) {
+      state.confidence = value;
+      document.querySelectorAll("#confidence button").forEach((btn) => btn.classList.toggle("active", btn.dataset.value === value));
+      $("nextBtn").disabled = false;
+      logEvent("confidence_set", { roundId: rounds[state.currentRound].id, confidence: value });
+    }
+
+    async function finishRound() {
+      const round = rounds[state.currentRound];
+      const elapsedMs = Date.now() - state.roundStartedAt;
+      const ranking = state.order.map((card, index) => ({
+        rank: index + 1,
+        feature: card.feature,
+        group: card.group,
+        piece: card.piece,
+        segmentMode: card.mode,
+        pair: card.pair,
+        label: card.label,
+        source: card.source,
+        target: card.target
+      }));
+      state.results.push({
+        roundId: round.id,
+        prompt: round.prompt,
+        elapsedMs,
+        confidence: state.confidence,
+        ranking
+      });
+      const timeBonus = Math.max(20, 80 - Math.floor(elapsedMs / 2500));
+      const confidenceBonus = state.confidence === "clear" ? 30 : state.confidence === "some" ? 20 : 10;
+      state.score += timeBonus + confidenceBonus;
+      logEvent("round_finish", { roundId: round.id, elapsedMs, confidence: state.confidence, ranking });
+      state.currentRound += 1;
+      await sendLog(false);
+      if (state.currentRound >= rounds.length) {
+        await finishGame();
+      } else {
+        renderRound();
+      }
+    }
+
+    async function finishGame() {
+      window.clearInterval(timerId);
+      timerId = null;
+      $("progressBar").style.width = "100%";
+      logEvent("session_finish", { totalElapsedMs: Date.now() - state.startedAt, score: state.score });
+      const payload = await sendLog(true);
+      activate("finish");
+      const shortCode = state.sessionId.split("-").slice(-1)[0].toUpperCase();
+      $("resultCode").textContent = shortCode;
+      $("finishText").textContent = `${formatTime(payload.totalElapsedMs)}で完了しました。スコアは${state.score}です。`;
+      $("summaryTable").innerHTML = `
+        <tr><td>参加コード</td><td>${escapeHtml(state.participantCode)}</td></tr>
+        <tr><td>年代</td><td>${escapeHtml(state.ageGroup)}</td></tr>
+        <tr><td>所要時間</td><td>${formatTime(payload.totalElapsedMs)}</td></tr>
+        <tr><td>保存キー</td><td>${escapeHtml(state.sessionId)}</td></tr>
+      `;
+      updateHud();
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+
+    function buildCsv() {
+      const rows = [["session_id", "participant_code", "age_group", "round_id", "elapsed_ms", "confidence", "rank", "feature", "group", "piece", "segment_mode", "pair", "label"]];
+      state.results.forEach((result) => {
+        result.ranking.forEach((item) => {
+          rows.push([state.sessionId, state.participantCode, state.ageGroup, result.roundId, result.elapsedMs, result.confidence, item.rank, item.feature, item.group, item.piece, item.segmentMode, item.pair, item.label]);
+        });
+      });
+      return rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    }
+
+    function download(name, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    $("startBtn").addEventListener("click", startGame);
+    $("nextBtn").addEventListener("click", finishRound);
+    $("againBtn").addEventListener("click", () => {
+      activate("intro");
+      $("roundMeter").textContent = "0/3";
+      $("timerMeter").textContent = "0:00";
+      $("scoreMeter").textContent = "0";
+    });
+    document.querySelectorAll("#confidence button").forEach((button) => {
+      button.addEventListener("click", () => setConfidence(button.dataset.value));
+    });
+    $("downloadJsonBtn").addEventListener("click", async () => {
+      const payload = await sendLog(true);
+      download(`${state.sessionId}.json`, JSON.stringify(payload, null, 2), "application/json");
+    });
+    $("downloadCsvBtn").addEventListener("click", () => download(`${state.sessionId}.csv`, buildCsv(), "text/csv;charset=utf-8"));
+    $("copyCodeBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText($("resultCode").textContent);
+      showToast("コピーしました");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "allowed_cidrs": [
+    "127.0.0.1/32",
+    "::1/128",
+    "163.215.0.0/16"
+  ],
+  "split_logs_by_scope": true,
+  "lab_cidrs": [
+    "127.0.0.1/32",
+    "::1/128",
+    "163.215.0.0/16"
+  ],
+  "warp_cidrs": [
+    "104.28.204.113/32"
+  ],
+  "log_denied": true,
+  "deny_message": "This page is only available from the allowed network.",
+  "note": "Set enabled to true after confirming the lab/client CIDR. 163.215.0.0/16 is a campus-wide candidate, not a confirmed lab-only range."
+}

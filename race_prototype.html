@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sound Derby Prototype</title>
+  <link rel="stylesheet" href="race_prototype.css">
+</head>
+<body>
+  <main>
+    <section class="panel" id="intro">
+      <p class="eyebrow">PROTOTYPE / 本番ログなし</p>
+      <h1>Sound Derby</h1>
+      <p class="lead">お手本に近い音の着順を予想するミニゲームです。</p>
+      <button id="startBtn" type="button">レース開始</button>
+    </section>
+
+    <section class="panel hidden" id="game">
+      <div class="top">
+        <div>
+          <p class="eyebrow" id="roundLabel">RACE 1</p>
+          <h2>近い順の着順を予想</h2>
+        </div>
+        <div class="score"><b id="scoreText">0</b><span>PTS</span></div>
+      </div>
+
+      <div class="reference">
+        <span>お手本</span>
+        <audio id="referenceAudio" controls preload="metadata"></audio>
+      </div>
+
+      <div class="track" id="track"></div>
+
+      <div class="actions">
+        <button id="raceBtn" type="button">この着順でゴール</button>
+        <button id="shuffleBtn" type="button" class="ghost">並び替えリセット</button>
+      </div>
+      <p class="hint">カードを上下ボタンで動かして、1着から4着を決めます。これは試作なので本番ログには保存しません。</p>
+    </section>
+
+    <section class="panel hidden" id="finish">
+      <p class="eyebrow">FINISH</p>
+      <h2 id="finishTitle">結果</h2>
+      <p id="finishText"></p>
+      <button id="againBtn" type="button">もう一度</button>
+    </section>
+  </main>
+
+  <script src="cards_2sec.js"></script>
+  <script src="race_prototype.js"></script>
+</body>
+</html>
