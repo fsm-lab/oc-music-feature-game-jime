@@ -1,12 +1,21 @@
 # Sharing Guide
 
-This repository is private by default because it contains research-specific app logic and generated card metadata.
+This repository is public so that the app source can be shared by URL.
 
-## Best Option: Invite a GitHub Account
+## Share the Public URL
 
-Ask the recipient for their GitHub username, then invite them as a collaborator.
+Share this URL:
+
+```text
+https://github.com/hajimeTUT/open-campus-feature-game
+```
+
+## If Account-Level Access Management Is Needed
+
+Public repositories do not provide account-level access control for readers. If access needs to be limited to named people, make the repository private again and invite GitHub accounts as collaborators.
 
 ```bash
+gh repo edit hajimeTUT/open-campus-feature-game --visibility private
 gh api \
   --method PUT \
   -H "Accept: application/vnd.github+json" \
@@ -14,19 +23,7 @@ gh api \
   -f permission=pull
 ```
 
-After the invitation is accepted, share this URL:
-
-```text
-https://github.com/hajimeTUT/open-campus-feature-game
-```
-
-## Alternative: Make the Repository Public
-
-Only use this if it is acceptable to publish the app source and generated card metadata publicly.
-
-```bash
-gh repo edit hajimeTUT/open-campus-feature-game --visibility public --accept-visibility-change-consequences
-```
+GitHub repository Traffic can show aggregate clone/view counts to repository admins, but it does not provide a reliable per-reader notification for every public access.
 
 ## Fallback: Share a ZIP
 
