@@ -100,3 +100,4 @@ Quick Tunnel URLは一時URLです。停止や再起動で変わります。
 - 氏名、学校名、連絡先は入力させない前提です。
 - HTTPアプリから通常MACアドレスは取得できません。
 - GitHubには `logs/`, `registered_devices.json`, `access_control.json`, `clips/` を入れない設定にしています。
+
