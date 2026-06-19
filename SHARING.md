@@ -7,7 +7,7 @@ This repository is public so that the app source can be shared by URL.
 Share this URL:
 
 ```text
-https://github.com/hajimeTUT/open-campus-feature-game
+https://github.com/fsm-lab/open-campus-feature-game
 ```
 
 ## If Account-Level Access Management Is Needed
@@ -15,11 +15,11 @@ https://github.com/hajimeTUT/open-campus-feature-game
 Public repositories do not provide account-level access control for readers. If access needs to be limited to named people, make the repository private again and invite GitHub accounts as collaborators.
 
 ```bash
-gh repo edit hajimeTUT/open-campus-feature-game --visibility private
+gh repo edit fsm-lab/open-campus-feature-game --visibility private
 gh api \
   --method PUT \
   -H "Accept: application/vnd.github+json" \
-  /repos/hajimeTUT/open-campus-feature-game/collaborators/<github-username> \
+  /repos/fsm-lab/open-campus-feature-game/collaborators/<github-username> \
   -f permission=pull
 ```
 
